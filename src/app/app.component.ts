@@ -5,7 +5,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatTableModule } from '@angular/material/table';
 import { FormsModule } from '@angular/forms';
-import { CommonModule } from '@angular/common';
+import { CommonModule, DatePipe } from '@angular/common';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatButtonModule } from '@angular/material/button';
@@ -28,10 +28,10 @@ import { inject } from '@angular/core';
   ],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
+  providers: [DatePipe]
 })
 export class AppComponent {
-  http = inject(HttpClient);
-
+  constructor(private http: HttpClient, private datePipe: DatePipe) {}
 
   dateFrom: Date | null = null;
   dateTo: Date | null = null;
@@ -42,7 +42,7 @@ export class AppComponent {
     genero: 'Género',
     peso: 'Peso (kg)',
     celular: 'Teléfono',
-    correo: 'Correo electrónico',
+    nro_documento: 'Número de documento',
     fecha_registro: 'Fecha de registro',
     empresa: 'Empresa',
     plataforma: 'Plataforma',
@@ -53,7 +53,7 @@ export class AppComponent {
     translate_presion: 'Estado presión',
     estado_medicacion: 'Medicación'
   };
-  displayedColumns: string[] = ['nombre_cliente', 'estado_escaner', 'edad', 'genero', 'peso','celular','correo','fecha_registro','empresa','plataforma','presion_sanguinea','frecuencia_cardiaca','hr_kpi_saturacion_oxigeno','frecuencia_respiratoria','translate_presion','estado_medicacion'];
+  displayedColumns: string[] = ['nombre_cliente', 'estado_escaner', 'edad', 'genero', 'peso','celular','nro_documento','fecha_registro','empresa','plataforma','presion_sanguinea','frecuencia_cardiaca','hr_kpi_saturacion_oxigeno','frecuencia_respiratoria','translate_presion','estado_medicacion'];
 
   originalData: any[] = [];
   dataSource = new MatTableDataSource<any>(this.originalData);
@@ -65,7 +65,7 @@ export class AppComponent {
   }
 
   fetchData(from: string, to: string) {
-    const url = `http://https://selfie-api-dnrr.onrender.com/api/selfie?from=${from}&to=${to}`;
+    const url = `http://localhost:3000/api/selfie?from=${from}&to=${to}`;
     this.http.get<any[]>(url).subscribe(data => {
       this.originalData = data;
       this.dataSource.data = data;
@@ -94,6 +94,10 @@ export class AppComponent {
     const filterValue = (event.target as HTMLInputElement).value.trim().toLowerCase();
     this.dataSource.filter = filterValue;
   }
-  
+
+  formatDateToLocal(dateString: string): string {
+    const date = new Date(dateString);
+    return this.datePipe.transform(date, 'dd/MM/yyyy HH:mm:ss') || '';
+  }
   
 }
