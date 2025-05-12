@@ -36,24 +36,35 @@ export class AppComponent {
   dateFrom: Date | null = null;
   dateTo: Date | null = null;
   columnHeaders: { [key: string]: string } = {
-    nombre_cliente: 'Nombre completo',
-    estado_escaner: 'Estado escáner',
-    edad: 'Edad',
-    genero: 'Género',
-    peso: 'Peso (kg)',
-    celular: 'Teléfono',
-    nro_documento: 'Número de documento',
-    fecha_registro: 'Fecha de registro',
-    empresa: 'Empresa',
-    plataforma: 'Plataforma',
-    presion_sanguinea: 'Presión sanguínea',
-    frecuencia_cardiaca: 'Frec. cardíaca',
-    hr_kpi_saturacion_oxigeno: 'Saturación O₂',
-    frecuencia_respiratoria: 'Frec. respiratoria',
-    translate_presion: 'Estado presión',
-    estado_medicacion: 'Medicación'
+    med_fechreg: 'FECHA REGISTRO',
+    cplatf_cupon: 'CUPON',
+    tpdoc_desc: 'TIPO DOC',
+    cont_numdoc: 'NUM DOC',
+    fullName: 'NOMBRE COMPLETO',
+    cont_sexo: 'GENERO',
+    edad: 'EDAD',
+    celular: 'CELULAR',
+    talla: 'TALLA',
+    peso: 'PESO',
+    hipertenso: 'ES HIPERTENSO?',
+    medicina: 'TOMA MEDICACION?',
+    medicion: 'medicion',
+    presion1: 'presion1',
+    presion2: 'presion2',
+    frec_cardiaca: 'frec_cardiaca',
+    frec_respiratoria: 'frec_respiratoria',
+    saturacion: 'saturacion',
+    variabilidad: 'variabilidad',
+    estres: 'estres',
+    actividad: 'actividad',
+    sueno: 'sueno',
+    metabolismo: 'metabolismo',
+    salud: 'salud',
+    equilibrio: 'equilibrio',
+    relajacion: 'relajacion',
+    
   };
-  displayedColumns: string[] = ['nombre_cliente', 'estado_escaner', 'edad', 'genero', 'peso','celular','nro_documento','fecha_registro','empresa','plataforma','presion_sanguinea','frecuencia_cardiaca','hr_kpi_saturacion_oxigeno','frecuencia_respiratoria','translate_presion','estado_medicacion'];
+  displayedColumns: string[] = ['med_fechreg', 'cplatf_cupon', 'tpdoc_desc', 'cont_numdoc', 'fullName', 'cont_sexo', 'edad', 'celular', 'talla', 'peso', 'hipertenso', 'medicina', 'medicion', 'presion1', 'presion2', 'frec_cardiaca', 'frec_respiratoria', 'saturacion', 'variabilidad', 'estres', 'actividad', 'sueno', 'metabolismo', 'salud', 'equilibrio', 'relajacion'];
 
   originalData: any[] = [];
   dataSource = new MatTableDataSource<any>(this.originalData);
@@ -65,7 +76,7 @@ export class AppComponent {
   }
 
   fetchData(from: string, to: string) {
-    const url = `http://localhost:3000/api/selfie?from=${from}&to=${to}`;
+    const url = `https://selfie-api-dnrr.onrender.com/api/selfie?from=${from}&to=${to}`;
     this.http.get<any[]>(url).subscribe(data => {
       this.originalData = data;
       this.dataSource.data = data;

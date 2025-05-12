@@ -23,7 +23,7 @@
     <input matInput (keyup)="applyFilter($event)" placeholder="Buscar...">
   </mat-form-field>
 
-  <div style="overflow-x: auto;">
+  <div style="overflow: absolute;">
     <table mat-table [dataSource]="dataSource" matSort class="mat-elevation-z8" style="width: 100%;">
       <ng-container *ngFor="let column of displayedColumns" [matColumnDef]="column">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>
