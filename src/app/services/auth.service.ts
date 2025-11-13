@@ -13,6 +13,8 @@ export class AuthService {
   constructor(private http: HttpClient) {}
 
   loginWithToken(token: string, platformId: number): Observable<any> {
+    console.log("token enviado:", token);
+    console.log("platformId enviado:", platformId);
     const headers = new HttpHeaders({
       'Authorization': `Bearer ${token}`,
       'Content-Type': 'application/json'

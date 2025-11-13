@@ -1,0 +1,48 @@
+<div class="drawer" [class.closed]="!isOpen">
+
+  <!-- Logo -->
+  <div class="flex items-center justify-center h-28 border-b border-[#CFE1FF]">
+    <img src="/assets/img/logo.png" class="h-14" *ngIf="isOpen">
+    <mat-icon *ngIf="!isOpen">spa</mat-icon>
+  </div>
+
+  <!-- Botón toggle -->
+  <button class="toggle-btn" (click)="toggle()">
+    <mat-icon>{{ isOpen ? 'chevron_left' : 'chevron_right' }}</mat-icon>
+  </button>
+
+  <!-- Menú lateral -->
+  <div class="flex-1 mt-6">
+    <mat-accordion>
+      <mat-expansion-panel
+        *ngFor="let modulo of modulos"
+        class="shadow-none">
+
+        <mat-expansion-panel-header class="px-4">
+          <mat-icon>assessment</mat-icon>
+          <span *ngIf="isOpen" class="ml-2">{{ modulo.name }}</span>
+        </mat-expansion-panel-header>
+
+        <button
+          mat-button
+          class="w-full justify-start px-6"
+          *ngFor="let vista of modulo.views"
+          (click)="navigateTo(modulo.name, vista.name)">
+          <mat-icon>remove</mat-icon>
+          <span *ngIf="isOpen" class="ml-2">{{ vista.name }}</span>
+        </button>
+
+      </mat-expansion-panel>
+    </mat-accordion>
+  </div>
+
+  <!-- Logout -->
+  <div class="logout-section">
+    <button mat-flat-button class="w-full justify-start bg-[#F7F9FF] text-[#E10B6E]"
+            (click)="logout()">
+      <mat-icon>logout</mat-icon>
+      <span *ngIf="isOpen" class="ml-2">Cerrar sesión</span>
+    </button>
+  </div>
+
+</div>

@@ -1,0 +1,31 @@
+<header class="h-20 flex items-center px-10">
+
+  <div class="flex items-center justify-between bg-white/90 backdrop-blur rounded-3xl w-full h-14 px-6 shadow-md">
+
+    <!-- Título -->
+    <h1 class="text-lg font-semibold text-[#0B4A8C]">
+      {{ pageTitle }}
+    </h1>
+
+    <!-- Usuario -->
+    <div class="flex items-center gap-4">
+      <div class="text-right hidden sm:block">
+        <p class="text-[#0B4A8C] font-semibold">{{ user?.name }}</p>
+        <p class="text-sm text-gray-500 -mt-1">Bienvenido</p>
+      </div>
+
+      <button mat-icon-button [matMenuTriggerFor]="userMenu" class="bg-[#CFE9FF] rounded-full w-12 h-12 flex items-center justify-center">
+        <mat-icon>account_circle</mat-icon>
+      </button>
+
+      <mat-menu #userMenu="matMenu">
+        <button mat-menu-item (click)="logout()">
+          <mat-icon>logout</mat-icon>
+          <span>Cerrar sesión</span>
+        </button>
+      </mat-menu>
+    </div>
+
+  </div>
+
+</header>

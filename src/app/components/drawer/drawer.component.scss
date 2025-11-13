@@ -1,0 +1,19 @@
+.drawer {
+  @apply bg-white h-full border-r border-[#CFE1FF] flex flex-col relative transition-all duration-300;
+
+  width: 270px;
+
+  &.closed {
+    width: 80px;
+  }
+}
+
+/* Toggle button flotante */
+.toggle-btn {
+  @apply absolute top-28 -right-4 bg-[#E10B6E] text-white rounded-full w-8 h-8 flex items-center justify-center shadow cursor-pointer;
+}
+
+/* User section abajo */
+.logout-section {
+  @apply mt-auto p-4;
+}
