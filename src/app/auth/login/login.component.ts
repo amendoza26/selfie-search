@@ -79,7 +79,7 @@ export class LoginComponent implements OnInit {
   }
 
   private redirectToHolding(): void {
-    window.location.href = 'http://localhost:4200';
-    // Producción: window.location.href = 'https://holding.gruporedsalud.com';
+    // window.location.href = 'http://localhost:4200';
+    window.location.href = 'https://holding.gruporedsalud.com';
   }
 }

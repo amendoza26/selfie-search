@@ -8,7 +8,7 @@ import { environment } from '../../environments/environment';
   providedIn: 'root'
 })
 export class AuthService {
-  private apiUrl = environment.apiUrl; // http://127.0.0.1:5001/api/selfie
+  private apiUrl = "https://api-servicio.gruporedsalud.com/api/selfie"; // http://127.0.0.1:5001/api/selfie
 
   constructor(private http: HttpClient) {}
 
@@ -42,13 +42,13 @@ export class AuthService {
 
   // Métodos auxiliares
   getToken(): string | null {
-    return localStorage.getItem('token');
+    return localStorage.getItem('selfie-token');
   }
 
   clearSession(): void {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    localStorage.removeItem('modules');
+    localStorage.removeItem('selfie-token');
+    localStorage.removeItem('selfie-user');
+    localStorage.removeItem('selfie-modules');
   }
 
   isAuthenticated(): boolean {

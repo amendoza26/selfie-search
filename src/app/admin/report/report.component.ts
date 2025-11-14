@@ -198,9 +198,9 @@ export class ReportComponent {
       return;
     }
 
-    const url = 'http://127.0.0.1:5001/api/selfie/registros-selfie';
+    // const url = 'http://127.0.0.1:5001/api/selfie/registros-selfie';
     // En producción:
-    // const url = 'https://api-servicio.gruporedsalud.com/api/selfie/registros-selfie';
+    const url = 'https://api-servicio.gruporedsalud.com/api/selfie/obtener-mediciones';
 
     const body = {
       fecha_inicio: from,
