@@ -1,10 +1,11 @@
 import { Component, ViewChild } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatSort, MatSortModule } from '@angular/material/sort';
+import { MatPaginator } from '@angular/material/paginator';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatTableModule } from '@angular/material/table';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule, DatePipe } from '@angular/common';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
@@ -14,6 +15,11 @@ import { MatMenuModule } from '@angular/material/menu';
 import { HttpClient } from '@angular/common/http';
 import { Router, ActivatedRoute } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
+import { MatPaginatorModule } from '@angular/material/paginator';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import { FormControl } from '@angular/forms';
+import { Observable } from 'rxjs';
+import { map, startWith } from 'rxjs/operators';
 
 @Component({
   selector: 'app-root',
@@ -21,6 +27,7 @@ import { AuthService } from '../../services/auth.service';
   imports: [
     CommonModule,
     FormsModule,
+    ReactiveFormsModule,
     MatTableModule,
     MatInputModule,
     MatFormFieldModule,
@@ -29,7 +36,9 @@ import { AuthService } from '../../services/auth.service';
     MatNativeDateModule,
     MatButtonModule,
     MatIconModule,
-    MatMenuModule
+    MatMenuModule,
+    MatPaginatorModule,
+    MatAutocompleteModule
   ],
   templateUrl: './report.component.html',
   styleUrls: ['./report.component.scss'],
@@ -49,7 +58,12 @@ export class ReportComponent {
   originalData: any[] = [];
   dataSource = new MatTableDataSource<any>(this.originalData);
 
+  clienteControl = new FormControl('');
+  clientes: string[] = [];
+  filteredClientes!: Observable<string[]>;
+
   @ViewChild(MatSort) sort!: MatSort;
+  @ViewChild(MatPaginator) paginator!: MatPaginator;
 
   columnHeaders: { [key: string]: string } = {
     med_fechreg: 'FECHA REGISTRO',
@@ -114,6 +128,28 @@ export class ReportComponent {
 
   ngAfterViewInit() {
     this.dataSource.sort = this.sort;
+    this.dataSource.paginator = this.paginator;
+
+    // Configurar el paginador en español (opcional)
+    if (this.paginator) {
+      this.paginator.pageSize = 10;
+      this.paginator._intl.itemsPerPageLabel = 'Elementos por página:';
+      this.paginator._intl.nextPageLabel = 'Página siguiente';
+      this.paginator._intl.previousPageLabel = 'Página anterior';
+      this.paginator._intl.firstPageLabel = 'Primera página';
+      this.paginator._intl.lastPageLabel = 'Última página';
+      this.paginator._intl.getRangeLabel = (page: number, pageSize: number, length: number) => {
+        if (length === 0 || pageSize === 0) {
+          return `0 de ${length}`;
+        }
+        length = Math.max(length, 0);
+        const startIndex = page * pageSize;
+        const endIndex = startIndex < length ?
+          Math.min(startIndex + pageSize, length) :
+          startIndex + pageSize;
+        return `${startIndex + 1} - ${endIndex} de ${length}`;
+      };
+    }
   }
 
   /**
@@ -217,6 +253,8 @@ export class ReportComponent {
         this.originalData = data;
         this.dataSource.data = data;
         this.dataSource.sort = this.sort;
+        this.dataSource.paginator = this.paginator;
+        this.extractUniqueClientes(data);
       },
       error: (err) => {
         console.error('❌ Error al obtener registros:', err);
@@ -255,7 +293,7 @@ export class ReportComponent {
    */
   formatDateToLocal(dateString: string): string {
     const date = new Date(dateString);
-    return this.datePipe.transform(date, 'dd/MM/yyyy HH:mm:ss') || '';
+    return this.datePipe.transform(date, 'dd/MM/yyyy') || '';
   }
 
   /**
@@ -303,10 +341,10 @@ export class ReportComponent {
   // redirect holding
   private redirectToHolding() {
     // prod:
-    // window.location.href = 'https://holding.gruporedsalud.com';
+    window.location.href = 'https://holding.gruporedsalud.com';
 
     // dev:
-    window.location.href = 'http://localhost:4200';
+    // window.location.href = 'http://localhost:4200';
   }
 
   /**
@@ -315,5 +353,51 @@ export class ReportComponent {
   exportToExcel() {
     // Implementar exportación si lo necesitas
     console.log('Exportar a Excel');
+  }
+  extractUniqueClientes(data: any[]) {
+    // Extraer todos los nombres y eliminar duplicados
+    const nombresSet = new Set<string>();
+    data.forEach(item => {
+      if (item.fullName) {
+        nombresSet.add(item.fullName);
+      }
+    });
+
+    // Convertir a array y ordenar alfabéticamente
+    this.clientes = Array.from(nombresSet).sort();
+
+    // Configurar el filtro del autocomplete
+    this.filteredClientes = this.clienteControl.valueChanges.pipe(
+      startWith(''),
+      map(value => this._filterClientes(value || ''))
+    );
+  }
+
+  /**
+   * Filtrar clientes según lo que se escribe
+   */
+  private _filterClientes(value: string): string[] {
+    const filterValue = value.toLowerCase();
+    return this.clientes.filter(cliente =>
+      cliente.toLowerCase().includes(filterValue)
+    );
+  }
+
+  /**
+   * Cuando se selecciona un cliente del dropdown
+   */
+  onClienteSelected(cliente: string) {
+    console.log('Cliente seleccionado:', cliente);
+
+    // Filtrar la tabla por el cliente seleccionado
+    this.dataSource.filter = cliente.trim().toLowerCase();
+  }
+
+  /**
+   * Limpiar filtro de cliente
+   */
+  clearClienteFilter() {
+    this.clienteControl.setValue('');
+    this.dataSource.filter = '';
   }
 }

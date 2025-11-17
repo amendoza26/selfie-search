@@ -13,13 +13,16 @@
 
   <!-- Menú lateral -->
   <div class="flex-1 mt-6">
-    <mat-accordion>
+    <mat-accordion class="flex flex-col">
       <mat-expansion-panel
         *ngFor="let modulo of modulos"
-        class="shadow-none">
+        class="shadow-none w-[90%] self-center">
 
         <mat-expansion-panel-header class="px-4">
-          <mat-icon>assessment</mat-icon>
+          <img
+            [src]="getModuleImage(modulo.name)"
+            class="module-icon"
+          >
           <span *ngIf="isOpen" class="ml-2">{{ modulo.name }}</span>
         </mat-expansion-panel-header>
 

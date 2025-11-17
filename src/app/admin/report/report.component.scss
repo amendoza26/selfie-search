@@ -1,0 +1,65 @@
+// Opción 1: Básica
+::ng-deep .mat-mdc-row {
+  border-top: 0 !important;
+  border-bottom: 1px solid #e0e0e0 !important;
+}
+
+// Opción 2: Con tabla específica
+::ng-deep .mat-mdc-table .mat-mdc-row {
+  border-top: 0 !important;
+}
+
+// Opción 3: Por celdas
+::ng-deep .mat-mdc-cell {
+  border-top: none !important;
+}
+
+// Opción 4: Nuclear (usar solo si nada más funciona)
+::ng-deep table.mat-mdc-table tbody tr {
+  border-top: none !important;
+  border-bottom: 1px solid #e0e0e0 !important;
+}
+
+::ng-deep .mat-mdc-table {
+
+  // Celdas del body (tbody)
+  tbody .mat-mdc-cell {
+    border-bottom-color: #A2D0FF !important; // Cambia este color al que prefieras
+    border-bottom-width: 1px !important;
+    border-bottom-style: solid !important;
+  }
+
+  // Celdas del header (thead) - sin border inferior
+  thead .mat-mdc-header-cell {
+    border-bottom: none !important;
+  }
+}
+
+::ng-deep .mat-mdc-table {
+
+  // Color del THEAD (encabezado)
+  thead {
+    background-color: #D5EDFF!important;
+    tr {
+      color: #01387B!important; // ← Cambia aquí el color del thead
+    }
+  }
+
+  // Color del TBODY (filas de datos)
+  tbody {
+    background-color: #ffffff; // ← Cambia aquí el color del tbody
+    tr {
+      color: #6A7183;
+    }
+  }
+
+  // Color de cada fila
+  tbody .mat-mdc-row {
+    background-color: #ffffff; // ← Color base de las filas
+
+    // Efecto hover al pasar el mouse
+    &:hover {
+      background-color: #f5f5f5; // ← Color al pasar el mouse
+    }
+  }
+}

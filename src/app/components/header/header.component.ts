@@ -56,8 +56,9 @@ export class HeaderComponent {
    */
   private clearAndRedirect(): void {
     this.authService.clearSession();
-    window.location.href = 'http://localhost:4200';
-    // Producción: window.location.href = 'https://holding.gruporedsalud.com';
+    // window.location.href = 'http://localhost:4200';
+    //Producción:
+    window.location.href = 'https://holding.gruporedsalud.com';
   }
 
   /**

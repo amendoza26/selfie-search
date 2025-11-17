@@ -69,9 +69,9 @@ export class AdminComponent implements OnInit {
    */
   private redirectToHolding(): void {
     // Producción:
-    // window.location.href = 'https://holding.gruporedsalud.com';
+    window.location.href = 'https://holding.gruporedsalud.com';
 
     // Desarrollo:
-    window.location.href = 'http://localhost:4200';
+    // window.location.href = 'http://localhost:4200';
   }
 }

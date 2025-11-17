@@ -44,6 +44,7 @@ export class DrawerComponent implements OnInit {
 
   ngOnInit(): void {
     console.log('📦 Módulos en drawer:', this.modulos);
+    console.log('ICON PATH:', this.getModuleImage(this.modulos[0].name));
   }
 
   /**
@@ -120,15 +121,28 @@ export class DrawerComponent implements OnInit {
     this.authService.clearSession();
 
     // Producción:
-    // window.location.href = 'https://holding.gruporedsalud.com';
+    window.location.href = 'https://holding.gruporedsalud.com';
 
     // Desarrollo:
-    window.location.href = 'http://localhost:4200';
+    // window.location.href = 'http://localhost:4200';
   }
 
   /**
    * Obtener ícono del módulo (puedes personalizarlo)
    */
+
+  moduleImages: { [key: string]: string } = {
+    'Selfie': '/assets/icons/reporteria.png',
+    'Reportes': '/assets/icons/reporteria.png',
+    'Usuarios': '/assets/icons/usuarios.png',
+    'Dashboard': '/assets/icons/dashboard.png',
+    'default': '/assets/icons/reporteria.png'
+  };
+
+  getModuleImage(moduleName: string): string {
+    return this.moduleImages[moduleName] || this.moduleImages['default'];
+  }
+
   getModuleIcon(moduleName: string): string {
     const icons: { [key: string]: string } = {
       'Reportes': 'assessment',
