@@ -1,4 +1,4 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, HostListener, ViewChild } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatPaginator } from '@angular/material/paginator';
@@ -61,41 +61,45 @@ export class ReportComponent {
   clienteControl = new FormControl('');
   clientes: string[] = [];
   filteredClientes!: Observable<string[]>;
+  selectedPlatform: string | null = null;
+  platforms: string[] = [];
+  showPlatformList = false;
 
   @ViewChild(MatSort) sort!: MatSort;
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
   columnHeaders: { [key: string]: string } = {
-    med_fechreg: 'FECHA REGISTRO',
-    cplatf_cupon: 'CUPON',
-    tpdoc_desc: 'TIPO DOC',
-    cont_numdoc: 'NUM DOC',
-    fullName: 'NOMBRE COMPLETO',
-    cont_sexo: 'GENERO',
-    edad: 'EDAD',
-    celular: 'CELULAR',
-    talla: 'TALLA',
-    peso: 'PESO',
-    hipertenso: 'ES HIPERTENSO?',
-    medicina: 'TOMA MEDICACION?',
-    medicion: 'medicion',
-    presion1: 'presion1',
-    presion2: 'presion2',
-    frec_cardiaca: 'frec_cardiaca',
-    frec_respiratoria: 'frec_respiratoria',
-    saturacion: 'saturacion',
-    variabilidad: 'variabilidad',
-    estres: 'estres',
-    actividad: 'actividad',
-    sueno: 'sueno',
-    metabolismo: 'metabolismo',
-    salud: 'salud',
-    equilibrio: 'equilibrio',
-    relajacion: 'relajacion',
+    med_fechreg: 'Fecha de Registro',
+    platf_nomplatf: 'Cliente',
+    cplatf_cupon: 'Cupón',
+    tpdoc_desc: 'Tipo Doc.',
+    cont_numdoc: 'N° Doc.',
+    fullName: 'Nombre Completo',
+    cont_sexo: 'Género',
+    edad: 'Edad',
+    celular: 'Celular',
+    talla: 'Talla',
+    peso: 'Peso',
+    hipertenso: '¿Es hipertenso?',
+    medicina: '¿Toma medicación?',
+    medicion: 'Medición',
+    presion1: 'Presión Arterial (mmgh)',
+    presion2: 'Frecuencia cardíaca (bpm)',
+    frec_cardiaca: 'Frecuencia cardíaca (bpm)',
+    saturacion: 'Saturación (%)',
+    frec_respiratoria: 'Frecuencia respiratoria (rpm)',
+    variabilidad: 'Variabilidad',
+    estres: 'Estrés',
+    actividad: 'Actividad',
+    sueno: 'Sueño',
+    metabolismo: 'Metabolismo',
+    salud: 'Salud',
+    equilibrio: 'Equilibrio',
+    relajacion: 'Relajación',
   };
 
   displayedColumns: string[] = [
-    'med_fechreg', 'cplatf_cupon', 'tpdoc_desc', 'cont_numdoc',
+    'med_fechreg', 'platf_nomplatf', 'cplatf_cupon', 'tpdoc_desc', 'cont_numdoc',
     'fullName', 'cont_sexo', 'edad', 'celular', 'talla', 'peso',
     'hipertenso', 'medicina', 'medicion', 'presion1', 'presion2',
     'frec_cardiaca', 'frec_respiratoria', 'saturacion', 'variabilidad',
@@ -236,7 +240,8 @@ export class ReportComponent {
 
     // const url = 'http://127.0.0.1:5001/api/selfie/registros-selfie';
     // En producción:
-    const url = 'https://api-servicio.gruporedsalud.com/api/selfie/obtener-mediciones';
+    // const url = 'https://api-servicio.gruporedsalud.com/api/selfie/obtener-mediciones';
+    const url = 'http://127.0.0.1:5001/api/selfie/obtener-mediciones';
 
     const body = {
       fecha_inicio: from,
@@ -255,6 +260,8 @@ export class ReportComponent {
         this.dataSource.sort = this.sort;
         this.dataSource.paginator = this.paginator;
         this.extractUniqueClientes(data);
+        this.extractUniquePlataformas(data);
+
       },
       error: (err) => {
         console.error('❌ Error al obtener registros:', err);
@@ -400,4 +407,33 @@ export class ReportComponent {
     this.clienteControl.setValue('');
     this.dataSource.filter = '';
   }
+
+  extractUniquePlataformas(data: any[]) {
+    const set = new Set<string>();
+    data.forEach(item => {
+      if (item.platf_nomplatf) {
+        set.add(item.platf_nomplatf);
+      }
+    });
+    this.platforms = Array.from(set).sort();
+  }
+
+  selectPlatform(p: string) {
+    this.selectedPlatform = p;
+    this.showPlatformList = false;
+
+    this.dataSource.filter = p.toLowerCase();
+  }
+  toggleDropdown() {
+    this.showPlatformList = !this.showPlatformList;
+  }
+  @HostListener('document:click', ['$event'])
+  onClickOutside(event: Event) {
+    const target = event.target as HTMLElement;
+
+    if (!target.closest('.platform-wrapper')) {
+      this.showPlatformList = false;
+    }
+  }
+
 }

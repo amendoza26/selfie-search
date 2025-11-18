@@ -34,6 +34,51 @@
     border-bottom: none !important;
   }
 }
+::ng-deep .mat-mdc-text-field-wrapper{
+  padding: 0 !important;
+  margin: 0 !important;
+}
+::ng-deep .mat-mdc-input-element {
+  padding-left: 12px !important;
+  padding-right: 12px !important;
+}
+::ng-deep .mdc-notched-outline__leading,
+::ng-deep .mdc-notched-outline__notch,
+::ng-deep .mdc-notched-outline__trailing {
+  border: none !important;
+}
+
+/* FONDO Y RADIO GLOBAL (input + icono) */
+::ng-deep .mat-mdc-text-field-wrapper {
+  background: #F3F9FF !important;
+  border-radius: 31px !important;
+  padding: 0 !important; /* elimina padding interno */
+  box-sizing: border-box;
+}
+
+::ng-deep .mat-mdc-form-field-infix {
+  background-color: #F3F9FF !important;
+  border-radius: 31px;
+
+}
+::ng-deep .mat-mdc-input-element {
+  color: #6A7183 !important;
+  z-index: 100;
+}
+::ng-deep .mat-mdc-input-element::placeholder {
+  color: #6A7183 !important;
+  opacity: 1 !important;
+}
+::ng-deep button.mat-mdc-icon-button svg {
+  fill: #CF095E !important;
+}
+::ng-deep .mat-mdc-form-field-subscript-wrapper {
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+  height: 0 !important;
+  min-height: 0 !important;
+}
+
 
 ::ng-deep .mat-mdc-table {
 
