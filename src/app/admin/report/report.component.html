@@ -2,7 +2,7 @@
   <div style="display: flex; justify-content: space-between;">
     <div class="text-3xl text-primary font-extrabold">Reportería de Mediciones</div>
   </div>
-  <div class="flex items-center space-x-3 bg-white p-5 rounded-[22px] text-primary font-bold">
+  <div class="flex items-center bg-white p-5 rounded-[22px] text-primary font-bold space-x-12">
     <div class="flex flex-col">
       <mat-label>Desde</mat-label>
       <mat-form-field appearance="outline">
@@ -21,7 +21,10 @@
       </mat-form-field>
     </div>
 
-    <button class="text-white bg-[#CF095E] px-5 py-2 rounded-full text-[15px]" (click)="applyDateRangeFilter()">Buscar</button>
+    <div class="flex flex-col items-center">
+      <mat-label></mat-label>
+      <button class="text-white bg-[#CF095E] px-5 py-2 rounded-full text-[15px]" (click)="applyDateRangeFilter()">Buscar</button>
+    </div>
   </div>
 
   <!-- tabla  -->
@@ -29,9 +32,20 @@
 
     <div class="p-4 bg-white space-y-8">
 
-      <div class="flex space-x-2">
-        <div class="platform-wrapper flex flex-col relative">
-          <mat-label>Plataforma</mat-label>
+      <div class="flex space-x-2 justify-between">
+        <div class="platform-wrapper flex space-x-1 relative items-center">
+          <mat-label>Mostrar</mat-label>
+          <mat-form-field appearance="outline" style="width: 50px">
+            <mat-select [(value)]="pageSize" (selectionChange)="changePageSize($event.value)">
+              <mat-option *ngFor="let size of pageSizeOptions" [value]="size">
+                {{ size }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+          <mat-label>registros</mat-label>
+        </div>
+        <div class="platform-wrapper flex relative items-center">
+          <mat-label>Cliente</mat-label>
           <mat-form-field appearance="outline" style="width: 250px;">
 
             <!-- INPUT FAKE -->
@@ -63,8 +77,40 @@
           </div>
         </div>
 
-        <div class="flex flex-col">
-          <mat-label>Filtrar</mat-label>
+        <div class="platform-wrapper flex relative items-center">
+          <mat-label>Cupon</mat-label>
+          <mat-form-field appearance="outline" style="width: 250px;">
+
+            <!-- INPUT FAKE -->
+            <input
+              matInput
+              readonly
+              [value]="selectedCupon || ''"
+              placeholder="Seleccionar cupon"
+              (click)="showCuponList = !showCuponList">
+
+            <!-- Ícono -->
+            <button matSuffix mat-icon-button (click)="toggleCuponDropdown()">
+              <mat-icon>expand_more</mat-icon>
+            </button>
+          </mat-form-field>
+
+          <!-- LISTA -->
+          <div
+            *ngIf="showCuponList"
+            class="absolute left-0 top-full mt-1 bg-white border border-gray-200
+            rounded-xl shadow-md w-full max-h-60 overflow-auto z-[9999]">
+
+            <div
+              *ngFor="let c of cupons"
+              (click)="selectCupon(c)"
+              class="px-4 py-2 hover:bg-gray-100 cursor-pointer">
+              {{ c }}
+            </div>
+          </div>
+        </div>
+
+        <div class="flex items-center">
           <mat-form-field appearance="outline" style="width: 100%">
             <input matInput (keyup)="applyFilter($event)" placeholder="Buscar...">
           </mat-form-field>
@@ -89,10 +135,10 @@
       </div>
 
       <mat-paginator
-        [pageSizeOptions]="[10, 25, 50, 100]"
-        [pageSize]="10"
+        hidePageSize="true"
         showFirstLastButtons
-        aria-label="Seleccionar página">
+        pageSize="10"
+>
       </mat-paginator>
     </div>
 

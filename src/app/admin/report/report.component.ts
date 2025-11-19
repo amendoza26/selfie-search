@@ -20,6 +20,7 @@ import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { FormControl } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { map, startWith } from 'rxjs/operators';
+import { MatSelect } from '@angular/material/select';
 
 @Component({
   selector: 'app-root',
@@ -38,7 +39,8 @@ import { map, startWith } from 'rxjs/operators';
     MatIconModule,
     MatMenuModule,
     MatPaginatorModule,
-    MatAutocompleteModule
+    MatAutocompleteModule,
+    MatSelect
   ],
   templateUrl: './report.component.html',
   styleUrls: ['./report.component.scss'],
@@ -58,12 +60,15 @@ export class ReportComponent {
   originalData: any[] = [];
   dataSource = new MatTableDataSource<any>(this.originalData);
 
-  clienteControl = new FormControl('');
-  clientes: string[] = [];
-  filteredClientes!: Observable<string[]>;
   selectedPlatform: string | null = null;
   platforms: string[] = [];
   showPlatformList = false;
+  selectedCupon: string | null = null;
+  cupons: string[] = [];
+  showCuponList = false;
+
+  pageSize = 10;
+  pageSizeOptions = [10, 25, 50, 100];
 
   @ViewChild(MatSort) sort!: MatSort;
   @ViewChild(MatPaginator) paginator!: MatPaginator;
@@ -258,7 +263,7 @@ export class ReportComponent {
         this.dataSource.data = data;
         this.dataSource.sort = this.sort;
         this.dataSource.paginator = this.paginator;
-        this.extractUniqueClientes(data);
+        this.extractUniqueCupones(data);
         this.extractUniquePlataformas(data);
 
       },
@@ -346,65 +351,14 @@ export class ReportComponent {
 
   // redirect holding
   private redirectToHolding() {
-    // prod:
     window.location.href = 'https://holding.gruporedsalud.com';
-
-    // dev:
     // window.location.href = 'http://localhost:4200';
   }
 
-  /**
-   * Exportar datos a Excel (opcional)
-   */
-  exportToExcel() {
-    // Implementar exportación si lo necesitas
-    console.log('Exportar a Excel');
-  }
-  extractUniqueClientes(data: any[]) {
-    // Extraer todos los nombres y eliminar duplicados
-    const nombresSet = new Set<string>();
-    data.forEach(item => {
-      if (item.fullName) {
-        nombresSet.add(item.fullName);
-      }
-    });
-
-    // Convertir a array y ordenar alfabéticamente
-    this.clientes = Array.from(nombresSet).sort();
-
-    // Configurar el filtro del autocomplete
-    this.filteredClientes = this.clienteControl.valueChanges.pipe(
-      startWith(''),
-      map(value => this._filterClientes(value || ''))
-    );
-  }
-
-  /**
-   * Filtrar clientes según lo que se escribe
-   */
-  private _filterClientes(value: string): string[] {
-    const filterValue = value.toLowerCase();
-    return this.clientes.filter(cliente =>
-      cliente.toLowerCase().includes(filterValue)
-    );
-  }
-
-  /**
-   * Cuando se selecciona un cliente del dropdown
-   */
   onClienteSelected(cliente: string) {
     console.log('Cliente seleccionado:', cliente);
 
-    // Filtrar la tabla por el cliente seleccionado
     this.dataSource.filter = cliente.trim().toLowerCase();
-  }
-
-  /**
-   * Limpiar filtro de cliente
-   */
-  clearClienteFilter() {
-    this.clienteControl.setValue('');
-    this.dataSource.filter = '';
   }
 
   extractUniquePlataformas(data: any[]) {
@@ -432,7 +386,34 @@ export class ReportComponent {
 
     if (!target.closest('.platform-wrapper')) {
       this.showPlatformList = false;
+      this.showCuponList = false;
     }
   }
+
+  changePageSize(size: number) {
+    this.pageSize = size;
+    this.paginator.pageSize = size;
+    this.dataSource.paginator = this.paginator;
+  }
+  extractUniqueCupones(data: any[]) {
+    const set = new Set<string>();
+    data.forEach(item => {
+      if (item.cplatf_cupon) {
+        set.add(item.cplatf_cupon);
+      }
+    });
+    this.cupons = Array.from(set).sort();
+  }
+
+  selectCupon(c: string) {
+    this.selectedCupon = c;
+    this.showCuponList = false;
+
+    this.dataSource.filter = c.toLowerCase();
+  }
+  toggleCuponDropdown() {
+    this.showCuponList = !this.showCuponList;
+  }
+
 
 }
