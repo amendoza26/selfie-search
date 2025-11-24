@@ -21,6 +21,8 @@ import { FormControl } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { map, startWith } from 'rxjs/operators';
 import { MatSelect } from '@angular/material/select';
+import * as XLSX from 'xlsx';
+import { saveAs } from 'file-saver';
 
 @Component({
   selector: 'app-root',
@@ -60,12 +62,14 @@ export class ReportComponent {
   originalData: any[] = [];
   dataSource = new MatTableDataSource<any>(this.originalData);
 
-  selectedPlatform: string | null = null;
+  selectedPlatform: string | null = 'Todos';
+  selectedCupon: string | null = 'Todos';
   platforms: string[] = [];
   showPlatformList = false;
-  selectedCupon: string | null = null;
   cupons: string[] = [];
   showCuponList = false;
+
+  searchTerm: string = '';
 
   pageSize = 10;
   pageSizeOptions = [10, 25, 50, 100];
@@ -133,6 +137,26 @@ export class ReportComponent {
         this.checkExistingSession();
       }
     });
+    this.dataSource.filterPredicate = (data: any, filter: string) => {
+      // Filtrar por cliente
+      const clienteMatch = this.selectedPlatform && this.selectedPlatform !== 'Todos'
+        ? data.platf_nomplatf === this.selectedPlatform
+        : true;
+
+      // Filtrar por cupon
+      const cuponMatch = this.selectedCupon && this.selectedCupon !== 'Todos'
+        ? data.cplatf_cupon === this.selectedCupon
+        : true;
+
+      // Filtrar por búsqueda en cualquier columna
+      const searchMatch = this.searchTerm
+        ? Object.values(data).some(value =>
+            String(value).toLowerCase().includes(this.searchTerm.toLowerCase())
+          )
+        : true;
+
+      return clienteMatch && cuponMatch && searchMatch;
+    };
   }
 
   ngAfterViewInit() {
@@ -243,33 +267,37 @@ export class ReportComponent {
       return;
     }
 
-    // En producción:
     const url = 'https://api-servicio.gruporedsalud.com/api/selfie/obtener-mediciones';
-    // const url = 'http://127.0.0.1:5001/api/selfie/obtener-mediciones';
-
-    const body = {
-      fecha_inicio: from,
-      fecha_fin: to
-    };
-
-    const headers = {
-      Authorization: `Bearer ${this.token}`
-    };
+    const body = { fecha_inicio: from, fecha_fin: to };
+    const headers = { Authorization: `Bearer ${this.token}` };
 
     this.http.post<any[]>(url, body, { headers }).subscribe({
       next: (data) => {
         console.log('✅ Datos obtenidos:', data.length, 'registros');
+
         this.originalData = data;
         this.dataSource.data = data;
+
+        // Actualizar listas
+        this.extractUniquePlataformas(data);
+        this.extractUniqueCupones(data, this.selectedPlatform);
+
+        // Volver a aplicar filtro si no es "Todos"
+        if (this.selectedPlatform && this.selectedPlatform !== 'Todos') {
+          this.dataSource.filter = this.selectedPlatform.toLowerCase();
+        } else {
+          this.dataSource.filter = '';
+        }
+
+        if (this.selectedCupon && this.selectedCupon !== 'Todos') {
+          this.dataSource.filter = this.selectedCupon.toLowerCase();
+        }
+
         this.dataSource.sort = this.sort;
         this.dataSource.paginator = this.paginator;
-        this.extractUniqueCupones(data);
-        this.extractUniquePlataformas(data);
-
       },
       error: (err) => {
         console.error('❌ Error al obtener registros:', err);
-
         if (err.status === 401 || err.status === 403) {
           alert('Tu sesión ha expirado. Serás redirigido al Holding.');
           this.logout();
@@ -284,8 +312,8 @@ export class ReportComponent {
    * Aplicar filtro de búsqueda en la tabla
    */
   applyFilter(event: Event) {
-    const filterValue = (event.target as HTMLInputElement).value.trim().toLowerCase();
-    this.dataSource.filter = filterValue;
+    this.searchTerm = (event.target as HTMLInputElement).value.trim().toLowerCase();
+    this.dataSource.filter = Math.random().toString();
   }
 
   /**
@@ -364,19 +392,25 @@ export class ReportComponent {
   extractUniquePlataformas(data: any[]) {
     const set = new Set<string>();
     data.forEach(item => {
-      if (item.platf_nomplatf) {
-        set.add(item.platf_nomplatf);
-      }
+      if (item.platf_nomplatf) set.add(item.platf_nomplatf);
     });
-    this.platforms = Array.from(set).sort();
+    this.platforms = ['Todos', ...Array.from(set).sort()];
   }
 
-  selectPlatform(p: string) {
-    this.selectedPlatform = p;
+  selectPlatform(cliente: string) {
+    this.selectedPlatform = cliente;
     this.showPlatformList = false;
 
-    this.dataSource.filter = p.toLowerCase();
+    // Reconstruir cupones solo de ese cliente
+    this.extractUniqueCupones(this.originalData, cliente);
+
+    // Reset cupon a "Todos"
+    this.selectedCupon = 'Todos';
+
+    // 🔹 Forzar actualización del filtro
+    this.dataSource.filter = Math.random().toString();
   }
+
   toggleDropdown() {
     this.showPlatformList = !this.showPlatformList;
   }
@@ -395,25 +429,71 @@ export class ReportComponent {
     this.paginator.pageSize = size;
     this.dataSource.paginator = this.paginator;
   }
-  extractUniqueCupones(data: any[]) {
+  extractUniqueCupones(data: any[], clienteFilter: string | null = null) {
     const set = new Set<string>();
     data.forEach(item => {
       if (item.cplatf_cupon) {
-        set.add(item.cplatf_cupon);
+        // Si hay filtro de cliente, solo cupones de ese cliente
+        if (!clienteFilter || clienteFilter === 'Todos' || item.platf_nomplatf === clienteFilter) {
+          set.add(item.cplatf_cupon);
+        }
       }
     });
-    this.cupons = Array.from(set).sort();
+    this.cupons = ['Todos', ...Array.from(set).sort()];
   }
 
   selectCupon(c: string) {
     this.selectedCupon = c;
     this.showCuponList = false;
 
-    this.dataSource.filter = c.toLowerCase();
+    this.dataSource.filter = Math.random().toString();
   }
+
   toggleCuponDropdown() {
     this.showCuponList = !this.showCuponList;
   }
 
+  exportToExcel() {
+    // Tomamos solo los datos filtrados que se ven en la tabla
+    const dataToExport = this.dataSource.filteredData.map(row => {
+      return {
+        Fecha: this.formatDateToLocal(row.med_fechreg),
+        Cliente: row.platf_nomplatf,
+        Cupon: row.cplatf_cupon,
+        TipoDocumento: row.tpdoc_desc,
+        NroDocumento: row.cont_numdoc,
+        NombreCompleto: row.fullName,
+        Sexo: row.cont_sexo,
+        Edad: row.edad,
+        Celular: row.celular,
+        Talla: row.talla,
+        Peso: row.peso,
+        Hipertenso: row.hipertenso,
+        Medicina: row.medicina,
+        Medicion: row.medicion,
+        Presion1: row.presion1,
+        Presion2: row.presion2,
+        FrecuenciaCardiaca: row.frec_cardiaca,
+        Saturacion: row.saturacion,
+        Estrés: row.estres,
+        Actividad: row.actividad,
+        Sueño: row.sueno,
+        Metabolismo: row.metabolismo,
+        Salud: row.salud,
+        Equilibrio: row.equilibrio,
+        Relajacion: row.relajacion
+      };
+    });
+
+    // Crear hoja de Excel
+    const ws: XLSX.WorkSheet = XLSX.utils.json_to_sheet(dataToExport);
+
+    // Crear libro
+    const wb: XLSX.WorkBook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Mediciones');
+
+    // Guardar archivo
+    XLSX.writeFile(wb, 'mediciones.xlsx');
+  }
 
 }
