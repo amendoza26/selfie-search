@@ -21,7 +21,33 @@
       </mat-form-field>
     </div>
 
-    <div class="platform-wrapper flex relative flex-col">
+
+
+    <div class="flex flex-col items-center">
+      <mat-label></mat-label>
+      <button class="text-white bg-[#CF095E] px-5 py-2 rounded-full text-[15px]" (click)="applyDateRangeFilter()">Buscar</button>
+    </div>
+  </div>
+
+  <!-- tabla  -->
+  <div class="">
+
+    <div class="p-4 bg-white space-y-8">
+
+      <div class="flex space-x-2 justify-between">
+        <div class="platform-wrapper flex space-x-1 relative items-center">
+          <mat-label>Mostrar</mat-label>
+          <mat-form-field appearance="outline" style="width: 50px">
+            <mat-select [(value)]="pageSize" (selectionChange)="changePageSize($event.value)">
+              <mat-option *ngFor="let size of pageSizeOptions" [value]="size">
+                {{ size }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+          <mat-label>registros</mat-label>
+        </div>
+
+        <div class="platform-wrapper flex relative items-center">
       <mat-label>Cliente</mat-label>
       <mat-form-field appearance="outline" style="width: 250px;">
 
@@ -53,30 +79,6 @@
         </div>
       </div>
     </div>
-
-    <div class="flex flex-col items-center">
-      <mat-label></mat-label>
-      <button class="text-white bg-[#CF095E] px-5 py-2 rounded-full text-[15px]" (click)="applyDateRangeFilter()">Buscar</button>
-    </div>
-  </div>
-
-  <!-- tabla  -->
-  <div class="">
-
-    <div class="p-4 bg-white space-y-8">
-
-      <div class="flex space-x-2 justify-between">
-        <div class="platform-wrapper flex space-x-1 relative items-center">
-          <mat-label>Mostrar</mat-label>
-          <mat-form-field appearance="outline" style="width: 50px">
-            <mat-select [(value)]="pageSize" (selectionChange)="changePageSize($event.value)">
-              <mat-option *ngFor="let size of pageSizeOptions" [value]="size">
-                {{ size }}
-              </mat-option>
-            </mat-select>
-          </mat-form-field>
-          <mat-label>registros</mat-label>
-        </div>
 
 
         <div class="platform-wrapper flex relative items-center">
