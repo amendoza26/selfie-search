@@ -78,7 +78,8 @@ export class ReportComponent {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
   columnHeaders: { [key: string]: string } = {
-    med_fechreg: 'Fecha de Registro',
+    med_fechreg_fecha: 'Fecha de Registro',
+    med_fechreg_hora: 'Hora de Registro',
     platf_nomplatf: 'Cliente',
     cplatf_cupon: 'Cupón',
     tpdoc_desc: 'Tipo Doc.',
@@ -92,8 +93,7 @@ export class ReportComponent {
     hipertenso: '¿Es hipertenso?',
     medicina: '¿Toma medicación?',
     medicion: 'Medición',
-    presion1: 'Presión Arterial (mmgh)',
-    presion2: 'Frecuencia cardíaca (bpm)',
+    presion: 'Presión Arterial (mmgh)',
     frec_cardiaca: 'Frecuencia cardíaca (bpm)',
     saturacion: 'Saturación (%)',
     frec_respiratoria: 'Frecuencia respiratoria (rpm)',
@@ -108,9 +108,9 @@ export class ReportComponent {
   };
 
   displayedColumns: string[] = [
-    'med_fechreg', 'platf_nomplatf', 'cplatf_cupon', 'tpdoc_desc', 'cont_numdoc',
+    'med_fechreg_fecha','med_fechreg_hora', 'platf_nomplatf', 'cplatf_cupon', 'tpdoc_desc', 'cont_numdoc',
     'fullName', 'cont_sexo', 'edad', 'celular', 'talla', 'peso',
-    'hipertenso', 'medicina', 'medicion', 'presion1', 'presion2',
+    'hipertenso', 'medicina', 'medicion', 'presion',
     'frec_cardiaca', 'frec_respiratoria', 'saturacion', 'variabilidad',
     'estres', 'actividad', 'sueno', 'metabolismo', 'salud',
     'equilibrio', 'relajacion'
@@ -331,9 +331,20 @@ export class ReportComponent {
    * Formatear fecha para mostrar en la tabla
    */
   formatDateToLocal(dateString: string): string {
-    const date = new Date(dateString);
-    return this.datePipe.transform(date, 'dd/MM/yyyy') || '';
-  }
+  if (!dateString) return '';
+  const date = new Date(dateString);
+  return isNaN(date.getTime())
+    ? ''
+    : this.datePipe.transform(date, 'dd/MM/yyyy') || '';
+}
+
+formatHourToLocal(dateString: string): string {
+  if (!dateString) return '';
+  const date = new Date(dateString);
+  return isNaN(date.getTime())
+    ? ''
+    : this.datePipe.transform(date, 'HH:mm:ss') || '';
+}
 
   /**
    * Cerrar sesión
@@ -458,6 +469,7 @@ export class ReportComponent {
     const dataToExport = this.dataSource.filteredData.map(row => {
       return {
         Fecha: this.formatDateToLocal(row.med_fechreg),
+        Hora: this.formatHourToLocal(row.med_fechreg),
         Cliente: row.platf_nomplatf,
         Cupon: row.cplatf_cupon,
         TipoDocumento: row.tpdoc_desc,

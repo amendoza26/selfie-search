@@ -132,7 +132,26 @@
             </th>
 
             <td mat-cell *matCellDef="let element" style="font-size:12px">
-              {{ column === 'med_fechreg' ? formatDateToLocal(element[column]) : element[column] }}
+
+              <!-- FECHA -->
+              <ng-container *ngIf="column === 'med_fechreg_fecha'">
+                {{ formatDateToLocal(element['med_fechreg']) }}
+              </ng-container>
+
+              <!-- HORA -->
+              <ng-container *ngIf="column === 'med_fechreg_hora'">
+                {{ formatHourToLocal(element['med_fechreg']) }}
+              </ng-container>
+
+              <ng-container *ngIf="column === 'presion'">
+                {{ element['presion1'] }} / {{ element['presion2'] }}
+              </ng-container>
+
+              <!-- DEMÁS COLUMNAS -->
+              <ng-container *ngIf="column !== 'med_fechreg_fecha' && column !== 'med_fechreg_hora'">
+                {{ element[column] }}
+              </ng-container>
+
             </td>
           </ng-container>
 
